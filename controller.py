@@ -62,7 +62,7 @@ def color_fill(color):
     pixels.show()
     print(f"Color fill with {color}")
 
-def rainbow_cycle(colors, wait=0.05):
+def rainbow_cycle(colors, wait=0.05, gradient_steps_per_transition=20):
     """
     Cycle through a list of colors with smooth gradients, moving left.
 
@@ -76,9 +76,6 @@ def rainbow_cycle(colors, wait=0.05):
         if num_colors < 2:
             print("At least two colors are required for a gradient.")
             return
-
-        # Define the number of gradient steps between each pair of colors
-        gradient_steps_per_transition = 40  # Adjust for smoother or coarser gradients
 
         # Total number of steps in the entire cycle
         total_steps = num_colors * gradient_steps_per_transition

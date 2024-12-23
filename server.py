@@ -30,6 +30,7 @@ def api_rainbow_cycle():
     data = request.get_json()
     colors = data.get('colors')
     wait = data.get('wait', 0.05)
+    gradient_steps = data.get('gradient_steps', 20)
     
     # Validate colors
     if not colors or not isinstance(colors, list) or not all(isinstance(color, list) and len(color) == 3 for color in colors):
@@ -42,7 +43,7 @@ def api_rainbow_cycle():
     except ValueError:
         return jsonify({"error": "Colors must be integers and wait must be a float."}), 400
     
-    controller.start_effect(controller.rainbow_cycle, colors, wait)
+    controller.start_effect(controller.rainbow_cycle, colors, wait, gradient_steps)
     return jsonify({
         "status": "Rainbow cycle effect started.",
         "colors": colors,
