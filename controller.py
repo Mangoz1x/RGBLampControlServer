@@ -78,7 +78,7 @@ def rainbow_cycle(colors, wait=0.05):
             return
 
         # Define the number of gradient steps between each pair of colors
-        gradient_steps_per_transition = LED_COUNT // (num_colors * 2) # Adjust for smoother or coarser gradients
+        gradient_steps_per_transition = 40  # Adjust for smoother or coarser gradients
 
         # Total number of steps in the entire cycle
         total_steps = num_colors * gradient_steps_per_transition
