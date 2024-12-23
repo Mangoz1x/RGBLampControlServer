@@ -47,39 +47,42 @@ def color_fill(color):
 def rainbow_cycle(colors, num_display=1, wait=0.05):
     """
     Cycle through a list of colors, displaying 'num_display' colors at a time.
-    
+
     Args:
         colors (list of tuples): List of RGB color tuples.
         num_display (int): Number of colors to display simultaneously.
         wait (float): Time to wait between cycles in seconds.
     """
     try:
+        print(f"Starting rainbow_cycle with colors: {colors}, num_display: {num_display}, wait: {wait}")
         num_colors = len(colors)
         if num_colors == 0:
+            print("No colors provided to rainbow_cycle.")
             return
-        
-        # Extend the colors list to ensure smooth cycling
-        extended_colors = colors + colors[:num_display]
-        
+
+        # Calculate the number of LEDs per color
+        leds_per_color = LED_COUNT // num_display
+
+        # Create an infinite loop to cycle through colors
         while not stop_event.is_set():
             for i in range(num_colors):
                 if stop_event.is_set():
                     break
-                # Determine the current set of colors to display
-                current_colors = extended_colors[i:i + num_display]
-                
-                # Calculate how many times to repeat the color set across the strip
-                repeats = LED_COUNT // num_display + 1
-                
+                # Select the current set of colors to display
+                current_colors = colors[i:] + colors[:i]  # Rotate the color list
                 # Assign colors to the strip
                 for j in range(LED_COUNT):
-                    color_index = j // num_display % num_colors
-                    pixels[j] = current_colors[color_index]
-                
+                    color_set_index = (j // leds_per_color) % num_colors
+                    if color_set_index < num_display:
+                        pixels[j] = current_colors[color_set_index]
+                    else:
+                        pixels[j] = (0, 0, 0)  # Turn off excess LEDs if any
                 pixels.show()
+                logging.debug(f"Cycle {i}: Displaying colors {current_colors[:num_display]}")
                 time.sleep(wait)
-    except KeyboardInterrupt:
-        pass
+    except Exception as e:
+        logging.error(f"Error in rainbow_cycle: {e}")
+
 
 def breathing_effect(color, steps=50, wait=0.05):
     """Create a breathing effect by gradually adjusting brightness."""
