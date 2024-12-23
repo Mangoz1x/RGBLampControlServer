@@ -78,10 +78,10 @@ def rainbow_cycle(colors, num_display=1, wait=0.05):
                     else:
                         pixels[j] = (0, 0, 0)  # Turn off excess LEDs if any
                 pixels.show()
-                logging.debug(f"Cycle {i}: Displaying colors {current_colors[:num_display]}")
+                print(f"Cycle {i}: Displaying colors {current_colors[:num_display]}")
                 time.sleep(wait)
     except Exception as e:
-        logging.error(f"Error in rainbow_cycle: {e}")
+        print(f"Error in rainbow_cycle: {e}")
 
 
 def breathing_effect(color, steps=50, wait=0.05):
