@@ -51,7 +51,7 @@ def breathing_effect(color, steps=50, wait=0.05):
         pixels.show()
         time.sleep(wait)
 
-def theater_chase(color, wait):
+def theater_chase(color, alternate_color, wait):
     """Create a theater chase effect."""
     for step in range(10):  # Number of cycles
         for offset in range(3):
@@ -59,19 +59,32 @@ def theater_chase(color, wait):
                 if (i + offset) % 3 == 0:
                     pixels[i] = color
                 else:
-                    pixels[i] = (0, 0, 0)
+                    pixels[i] = alternate_color
             pixels.show()
             time.sleep(wait)
 
-def sparkle_effect(color, count=20, wait=0.05):
-    """Randomly sparkle LEDs with the given color."""
+def sparkle_effect(color, alternate_color, count=20, wait=0.05, fade_steps=10):
+    """Randomly sparkle LEDs with a fading effect."""
     import random
+
     for _ in range(count):
         pixel_index = random.randint(0, LED_COUNT - 1)
+
+        # Set the initial sparkle color
         pixels[pixel_index] = color
         pixels.show()
         time.sleep(wait)
-        pixels[pixel_index] = (0, 0, 0)  # Turn off the LED
+
+        # Gradually fade to the alternate color
+        for step in range(fade_steps):
+            brightness = 1 - (step / fade_steps)
+            faded_color = tuple(int(c * brightness) for c in color)
+            pixels[pixel_index] = faded_color
+            pixels.show()
+            time.sleep(wait / fade_steps)
+
+        # Ensure it ends at the alternate color
+        pixels[pixel_index] = alternate_color
         pixels.show()
 
 try:
@@ -80,8 +93,8 @@ try:
         time.sleep(1)
         rainbow_cycle(0.01)  # Rainbow
         breathing_effect((0, 0, 255))  # Blue breathing
-        theater_chase((255, 0, 0), 0.1)  # Red theater chase
-        sparkle_effect((0, 255, 0))  # Green sparkles
+        theater_chase((255, 0, 0), (0,255,0), 0.1)  # Red theater chase
+        sparkle_effect((0, 255, 0), (0, 0, 0))  # Green sparkles
 except KeyboardInterrupt:
     pixels.fill((0, 0, 0))
     pixels.show()
