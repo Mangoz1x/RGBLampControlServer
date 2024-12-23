@@ -8,7 +8,7 @@ PIN = board.D18  # GPIO pin for the data signal (18)
 ORDER = neopixel.GRB  # Color order (WS2815 uses GRB)
 
 # Create the LED strip object
-pixels = neopixel.NeoPixel(PIN, LED_COUNT, brightness=0.5, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(PIN, LED_COUNT, brightness=0.2, auto_write=False, pixel_order=ORDER)
 
 def color_fill(color):
     """Wipe color across the strip one LED at a time."""
@@ -36,11 +36,52 @@ def wheel(pos):
         pos -= 170
         return (pos * 3, 0, 255 - pos * 3)
 
+def breathing_effect(color, steps=50, wait=0.05):
+    """Create a breathing effect by gradually adjusting brightness."""
+    for step in range(steps):
+        brightness = step / steps
+        scaled_color = tuple(int(c * brightness) for c in color)
+        pixels.fill(scaled_color)
+        pixels.show()
+        time.sleep(wait)
+    for step in range(steps, 0, -1):
+        brightness = step / steps
+        scaled_color = tuple(int(c * brightness) for c in color)
+        pixels.fill(scaled_color)
+        pixels.show()
+        time.sleep(wait)
+
+def theater_chase(color, wait):
+    """Create a theater chase effect."""
+    for step in range(10):  # Number of cycles
+        for offset in range(3):
+            for i in range(LED_COUNT):
+                if (i + offset) % 3 == 0:
+                    pixels[i] = color
+                else:
+                    pixels[i] = (0, 0, 0)
+            pixels.show()
+            time.sleep(wait)
+
+def sparkle_effect(color, count=20, wait=0.05):
+    """Randomly sparkle LEDs with the given color."""
+    import random
+    for _ in range(count):
+        pixel_index = random.randint(0, LED_COUNT - 1)
+        pixels[pixel_index] = color
+        pixels.show()
+        time.sleep(wait)
+        pixels[pixel_index] = (0, 0, 0)  # Turn off the LED
+        pixels.show()
+
 try:
     while True:
         color_fill((255, 100, 50))  # White
         time.sleep(1)
         rainbow_cycle(0.01)  # Rainbow
+        breathing_effect((0, 0, 255))  # Blue breathing
+        theater_chase((255, 0, 0), 0.1)  # Red theater chase
+        sparkle_effect((0, 255, 0))  # Green sparkles
 except KeyboardInterrupt:
     pixels.fill((0, 0, 0))
     pixels.show()
