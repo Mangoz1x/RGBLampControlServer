@@ -44,16 +44,38 @@ def color_fill(color):
     pixels.fill(color)
     pixels.show()
 
-def rainbow_cycle(wait=0.01):
-    """Display a rainbow across the LEDs."""
+def rainbow_cycle(colors, num_display=1, wait=0.05):
+    """
+    Cycle through a list of colors, displaying 'num_display' colors at a time.
+    
+    Args:
+        colors (list of tuples): List of RGB color tuples.
+        num_display (int): Number of colors to display simultaneously.
+        wait (float): Time to wait between cycles in seconds.
+    """
     try:
+        num_colors = len(colors)
+        if num_colors == 0:
+            return
+        
+        # Extend the colors list to ensure smooth cycling
+        extended_colors = colors + colors[:num_display]
+        
         while not stop_event.is_set():
-            for j in range(255):
+            for i in range(num_colors):
                 if stop_event.is_set():
                     break
-                for i in range(LED_COUNT):
-                    rc_index = (i * 256 // LED_COUNT) + j
-                    pixels[i] = wheel(rc_index & 255)
+                # Determine the current set of colors to display
+                current_colors = extended_colors[i:i + num_display]
+                
+                # Calculate how many times to repeat the color set across the strip
+                repeats = LED_COUNT // num_display + 1
+                
+                # Assign colors to the strip
+                for j in range(LED_COUNT):
+                    color_index = j // num_display % num_colors
+                    pixels[j] = current_colors[color_index]
+                
                 pixels.show()
                 time.sleep(wait)
     except KeyboardInterrupt:
