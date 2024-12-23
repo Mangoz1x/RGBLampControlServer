@@ -29,28 +29,23 @@ def api_color_fill():
 def api_rainbow_cycle():
     data = request.get_json()
     colors = data.get('colors')
-    num_display = data.get('num_display', 1)
     wait = data.get('wait', 0.05)
     
     # Validate colors
-    if not colors or not isinstance(colors, list) or not all(len(color) == 3 for color in colors):
+    if not colors or not isinstance(colors, list) or not all(isinstance(color, list) and len(color) == 3 for color in colors):
         return jsonify({"error": "Invalid colors. Provide a list of RGB lists, e.g., [[R, G, B], ...]."}), 400
     
     try:
         # Convert colors to tuples of integers
         colors = [tuple(int(c) for c in color) for color in colors]
-        num_display = int(num_display)
         wait = float(wait)
-        if num_display < 1 or num_display > len(colors):
-            return jsonify({"error": f"num_display must be between 1 and {len(colors)}."}), 400
     except ValueError:
-        return jsonify({"error": "Colors must be integers, num_display must be an integer, and wait must be a float."}), 400
+        return jsonify({"error": "Colors must be integers and wait must be a float."}), 400
     
-    controller.start_effect(controller.rainbow_cycle, colors, num_display, wait)
+    controller.start_effect(controller.rainbow_cycle, colors, wait)
     return jsonify({
         "status": "Rainbow cycle effect started.",
         "colors": colors,
-        "num_display": num_display,
         "wait": wait
     }), 200
 
