@@ -1,7 +1,9 @@
 import json
 import os
+import threading
 
-from server import DATABASE_FILE, DATABASE_LOCK
+DATABASE_FILE = 'database.json'
+DATABASE_LOCK = threading.Lock()
 
 def load_database():
     """Load the database from the JSON file."""

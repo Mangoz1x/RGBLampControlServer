@@ -2,14 +2,10 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import threading
-from db import load_database, save_database, update_database, remove_from_database, get_from_database
+from db import DATABASE_LOCK, load_database, save_database, update_database, remove_from_database, get_from_database
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
-
-DATABASE_FILE = 'database.json'
-DATABASE_LOCK = threading.Lock()
 
 @app.route('/')
 def index():
