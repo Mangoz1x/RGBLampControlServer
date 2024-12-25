@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import DATABASE_LOCK, load_database, save_database, update_database, remove_from_database, get_from_database
+from db import load_database, save_database, update_database, remove_from_database, get_from_database
 import controller
 
 app = Flask(__name__)
@@ -230,10 +230,9 @@ def api_write():
     value = data.get('value')
     if key is None or value is None:
         return jsonify({"error": "Both 'key' and 'value' are required."}), 400
-    with DATABASE_LOCK:
-        db = load_database()
-        db.setdefault('custom_keys', {})[key] = value
-        save_database(db)
+    
+    update_database(key, value)
+
     return jsonify({"status": f"Key '{key}' written successfully.", "key": key, "value": value}), 200
 
 @app.route('/retrieve', methods=['POST'])
@@ -257,8 +256,6 @@ def api_delete():
 if __name__ == '__main__':
     try:
         # Initialize the database file if it doesn't exist
-        with DATABASE_LOCK:
-            load_database()
         app.run(host='0.0.0.0', port=5000)
     except KeyboardInterrupt:
         pass
