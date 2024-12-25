@@ -9,7 +9,7 @@ CORS(app)  # Enable CORS for all routes
 
 @app.route('/')
 def index():
-    return "WS2815 RGB Strip Control API with Database"
+    return "WS2815 RGB Strip Control API"
 
 # Existing APIs updated to write to the database only
 def extract_api_parameters(data, required_fields, optional_fields=None):
