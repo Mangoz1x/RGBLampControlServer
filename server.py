@@ -3,6 +3,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from db import DATABASE_LOCK, load_database, save_database, update_database, remove_from_database, get_from_database
+import controller
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -47,8 +48,11 @@ def api_color_fill():
         color = [int(c) for c in color]
     except ValueError:
         return jsonify({"error": "Color values must be integers."}), 400
+    
+    controller.start_effect(controller.color_fill, color)
     update_database('color_fill', {"color": color})
-    return jsonify({"status": "Color fill parameters saved.", "color": color}), 200
+    
+    return jsonify({"status": "Color fill applied.", "color": color}), 200
 
 @app.route('/rainbow_cycle', methods=['POST'])
 def api_rainbow_cycle():
@@ -70,13 +74,17 @@ def api_rainbow_cycle():
         gradient_steps = int(gradient_steps)
     except ValueError:
         return jsonify({"error": "Colors must be integers, wait must be a float, and gradient_steps must be an integer."}), 400
+    
+    controller.start_effect(controller.rainbow_cycle, colors, wait, gradient_steps)
+    
     update_database('rainbow_cycle', {
         "colors": colors,
         "wait": wait,
         "gradient_steps": gradient_steps
     })
+    
     return jsonify({
-        "status": "Rainbow cycle parameters saved.",
+        "status": "Rainbow cycle applied.",
         "colors": colors,
         "wait": wait,
         "gradient_steps": gradient_steps
@@ -101,12 +109,16 @@ def api_breathing_effect():
         wait = float(wait)
     except ValueError:
         return jsonify({"error": "Invalid parameters. Ensure color is integers, steps is int, wait is float."}), 400
+    
+    controller.start_effect(controller.breathing_effect, color, steps, wait)
+    
     update_database('breathing_effect', {
         "color": color,
         "steps": steps,
         "wait": wait
     })
-    return jsonify({"status": "Breathing effect parameters saved.", "color": color, "steps": steps, "wait": wait}), 200
+    
+    return jsonify({"status": "Breathing effect applied.", "color": color, "steps": steps, "wait": wait}), 200
 
 @app.route('/theater_chase', methods=['POST'])
 def api_theater_chase():
@@ -127,13 +139,16 @@ def api_theater_chase():
         wait = float(wait)
     except ValueError:
         return jsonify({"error": "Color values must be integers and wait must be a float."}), 400
+    
+    controller.start_effect(controller.theater_chase, color, alternate_color, wait)
+     
     update_database('theater_chase', {
         "color": color,
         "alternate_color": alternate_color,
         "wait": wait
     })
     return jsonify({
-        "status": "Theater chase parameters saved.",
+        "status": "Theater chase applied.",
         "color": color,
         "alternate_color": alternate_color,
         "wait": wait
@@ -162,6 +177,8 @@ def api_sparkle_effect():
         fade_steps = int(fade_steps)
     except ValueError:
         return jsonify({"error": "Invalid parameters. Ensure colors are integers and count, fade_steps are integers, wait is float."}), 400
+    
+    controller.start_effect(controller.sparkle_effect, color, alternate_color, count, wait, fade_steps)
     update_database('sparkle_effect', {
         "color": color,
         "alternate_color": alternate_color,
@@ -169,8 +186,9 @@ def api_sparkle_effect():
         "wait": wait,
         "fade_steps": fade_steps
     })
+    
     return jsonify({
-        "status": "Sparkle effect parameters saved.",
+        "status": "Sparkle effect parameters applied.",
         "color": color,
         "alternate_color": alternate_color,
         "count": count,
@@ -191,13 +209,18 @@ def api_set_brightness():
             raise ValueError
     except ValueError:
         return jsonify({"error": "Brightness must be a float between 0.0 and 1.0."}), 400
+    
+    controller.set_brightness(brightness)
     update_database('set_brightness', {"brightness": brightness})
-    return jsonify({"status": "Brightness parameter saved.", "brightness": brightness}), 200
+    
+    return jsonify({"status": "Brightness parameter applied.", "brightness": brightness}), 200
 
 @app.route('/stop', methods=['POST'])
 def api_stop():
+    controller.stop_current_effect()
+    controller.cleanup()
     update_database('stop', {})
-    return jsonify({"status": "Stop command saved."}), 200
+    return jsonify({"status": "Stop command applied."}), 200
 
 # New APIs for database interaction
 @app.route('/write', methods=['POST'])
