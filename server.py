@@ -2,7 +2,7 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import load_database, save_database, update_database, remove_from_database, get_from_database
+from db import update_database, remove_from_database, get_from_database
 import controller
 
 app = Flask(__name__)
